@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>HPC</title>
+</head>
+<style>
+*{
+ box-sizing: border-box;
+}
+    /* General Styles */
+    body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        display: flex;
+        height: 100vh;
+    }
+    input {
+        padding: 5px;
+        width: 50%;
+    }
+    /* Sidebar Styles */
+    .sidebar {
+        margin-top: 50px;
+        width: 250px;
+        background-color: #ffffff;
+        color: rgb(26, 25, 25);
+        box-sizing: border-box;
+        position: fixed;
+        height: 100%;
+        border: 1px solid #ccc; /* Add border */
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Add shadow */
+    }
+
+    .sidebar h2 {
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    .sidebar ul {
+        list-style-type: none;
+        padding: 0;
+    }
+
+
+    .sidebar ul li div {
+        display: flex;
+        align-items: center;
+        width: 100%;
+
+        justify-content: center;
+        border-radius: 10px;
+    }
+
+    .sidebar ul li a {
+        color: rgb(0, 0, 0);
+        text-decoration: none;
+        display: block;
+        padding: 10px;
+        border-radius: 5px;
+
+    }
+
+    .sidebar ul li :hover {
+        background-color: #eccd1f;
+
+    }
+
+    /* Content Styles */
+    .content {
+        margin-top: 50px;
+        margin-left: 250px; /* Matches sidebar width */
+        padding: 20px;
+        flex: 1;
+        box-sizing: border-box;
+        display: flex;
+        flex-direction: column;
+
+
+    }
+
+    .content h1 {
+        margin-top: 0;
+    }
+.navbar {
+    background: linear-gradient(to right, #1e3c72, #2a5298); /* Gradient background */
+    color: white;
+    text-align: center;
+    padding: 10px 0;
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 1000;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Add shadow */
+    height: 50px;
+    display: flex;
+    justify-content: space-between;
+    align-content: center;
+}
+    .navbar h2 {
+
+        font-size: 24px;
+        font-weight: bold;
+        letter-spacing: 1px;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        margin: 0;
+    }
+    /* Responsive Sidebar */
+    @media (max-width: 768px) {
+        .sidebar {
+            width: 200px;
+        }
+        .content {
+            margin-left: 200px;
+        }
+    }
+
+    @media (max-width: 500px) {
+        .sidebar {
+            width: 150px;
+        }
+        .content {
+            margin-left: 150px;
+        }
+    }
+.scrollable-list {
+    height: 300px;
+    max-height: 500px; /* Adjust the height as needed */
+    overflow-y: auto;  /* Enables vertical scrolling */
+    border: 1px solid #ccc; /* Optional: adds a border around the scrollable div */
+    padding: 5px; /* Optional: adds some padding inside the div */
+    background-color: #f9f9f9; /* Optional: adds a background color */
+}
+
+.scrollable-list ul {
+    list-style-type: none; /* Optional: removes default list styling */
+    padding: 0; /* Optional: removes default padding */
+    margin: 0; /* Optional: removes default margin */
+}
+
+.scrollable-list li {
+    padding: 5px 0; /* Optional: adds space between list items */
+}
+</style>
+<body>
+<div class="navbar">
+    <h2> Vbox HPC</h2>
+    <div style="display: flex; align-items: center; margin-right: 20px;">
+        <img src="/uploads/image/user_image.png" alt="User Icon" style="width:30px; height: 30px; margin-right: 10px;">
+   <h5 th:text="${user.getEmail()}"></h5>
+    </div>
+</div>
+
+<div class="sidebar">
+    <div style=" background-color: #E5E1DA; padding: 2px;  border-bottom: 2px solid #ccc;  ">
+        <h3 style="margin: 5px;">Job Submission</h3>
+    </div>
+    <ul  style="height: 85%; display: flex; flex-direction: column; justify-content: space-between;" >
+        <div>
+            <li>
+                <div style="display: flex;justify-content: left">
+                    <img src="/uploads/image/application_7376423.png" alt="Job Icon" style=" margin-left: 20px ;width: 20px;height:20px;margin-right: 5px ;"> <a href="/?typejob=cppmpijob">CPP MPI Job</a>
+                </div>
+            </li>
+
+            <li>
+                <div style="display: flex;justify-content: left">
+                    <img src="/uploads/image/application_7376423.png" alt="Job Icon" style=" margin-left: 20px ;width: 20px;height:20px;margin-right: 5px ;"> <a href="/?typejob=pythonjob">Python Job</a>
+                </div>
+            </li>
+            <li>
+                <div style="display: flex;justify-content: left">
+                    <img src="/uploads/image/application_7376423.png" alt="Job Icon" style=" margin-left: 20px ;width: 20px;height:20px;margin-right: 5px ;"> <a href="/?typejob=cppjob">CPP Job</a>
+                </div>
+            </li>
+        </div>
+        <li>
+            <div style="display: flex; justify-content: left; ">
+                <img src="/uploads/image/logout-icon.png" alt="Logout Icon" style="margin-left: 20px; width: 20px; height: 20px; margin-right: 5px;">
+                <a href="/logout">Logout</a>
+            </div>
+        </li>
+    </ul>
+</div>
+<div class="content">
+    <div style="text-align: center">
+        <h2>There are <span th:text="${numCpuFree}">0</span> CPUs free!!!</h2>
+        <h2> Memory available : <span th:text="${memAvailable}">0</span> !!!</h2>
+    </div >
+    <div style="display: flex; justify-content: center">
+    <div style="width: 70%;display: flex;flex-direction: column;align-items: center">
+        <div th:if="${message}">
+            <h2 th:text="${message}"></h2>
+        </div>
+        <div style="width:60%" th:if="${typejob == 'cppmpijob' or typejob==null}"  >
+            <h2 style= " display:flex; justify-self: center">Upload CPP MPI Job </h2>
+            <form   method="post" action="/handleUploadFile?typejob=cppmpijob" enctype="multipart/form-data" style="display: flex; flex-direction: column;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 10px; ">
+                    <label >Job Name</label>
+                    <input type="text" name="job-name" placeholder="Enter job name" required>
+                </div>
+                <div  style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                    <label >Number of Chunks</label>
+                    <input type="number"  name="num-chunks" min="1" value="1" required>
+                </div>
+                <div  style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                    <label >Number of CPU / Chunk  </label>
+                    <input type="number"  name="num-CpuPerChunk" min="1" value="1" required>
+                </div>
+                <div  style="display: flex; justify-content: space-between; margin-bottom: 10px;" >
+                    <label>Physical Memory</label>
+                    <input type="text" name="memory" value="400mb" required>
+                </div>
+                <div  style="display: flex; justify-content: space-between; margin-bottom: 10px;" >
+                    <label>Wall time</label>
+                    <input type="text"  name="wall_time" value="01:00:00" required>
+                </div>
+                <div  style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                    <label >Gmail Notification</label>
+                    <input type="checkbox" name="is_gmail_notification" value="false" onchange="updateCheckboxValue(this)">
+                </div>
+                <div>
+                </div>
+                <!--            <form  method="post" action="/uploadCppMpiFiles" enctype="multipart/form-data">-->
+                <div  style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                    <label>Main File:</label>
+                    <input type="file" name="mainfile" />
+                </div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                    <label >Enclosed Files:</label>
+                    <input type="file" name="enclosedfiles"   multiple />
+                </div>
+
+                <input type="submit" value="Submit Job"  style=" width:50%; display: flex; align-self: center;"/>
+            </form>
+        </div>
+        <div style="width:60%" th:if="${typejob == 'pythonjob' }">
+            <h2 style= " display:flex; justify-self: center"> Upload Python Job </h2>
+            <form  method="post" action="/handleUploadFile?typejob=pythonjob" enctype="multipart/form-data" style="display: flex; flex-direction: column;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 10px; ">
+                    <label >Job Name</label>
+                    <input type="text" name="job-name" placeholder="Enter job name" required>
+                </div>
+                <div  style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                    <label >Number of Chunks</label>
+                    <input type="number"  name="num-chunks" min="1" value="1" required>
+                </div>
+                <div  style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                    <label >Number of CPU / Chunk  </label>
+                    <input type="number"  name="num-CpuPerChunk" min="1" value="1" required>
+                </div>
+                <div  style="display: flex; justify-content: space-between; margin-bottom: 10px;" >
+                    <label>Physical Memory</label>
+                    <input type="text" name="memory" value="400mb" required>
+                </div>
+                <div  style="display: flex; justify-content: space-between; margin-bottom: 10px;" >
+                    <label>Wall time</label>
+                    <input type="text"  name="wall_time" value="01:00:00" required>
+                </div>
+                <div  style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                    <label >Gmail Notification</label>
+                    <input type="checkbox" name="is_gmail_notification" value="false" onchange="updateCheckboxValue(this)">
+                </div>
+                <div>
+
+                </div>
+                <!--            <form  method="post" action="/uploadCppMpiFiles" enctype="multipart/form-data">-->
+                <div  style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                    <label for="mainpythonfile">Main File:</label>
+                    <input type="file" name="mainfile" id="mainpythonfile" />
+                </div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                    <label for="enclosedpythonfiles">Enclosed Files:</label>
+                    <input type="file" name="enclosedfiles" id="enclosedpythonfiles" multiple />
+                </div>
+
+
+                <!--            </form>-->
+
+                <input type="submit" value="Submit Job"  style=" width:50%; display: flex; align-self: center;"/>
+
+            </form>
+        </div>
+        <div style="width:60%" th:if="${typejob == 'cppjob' }"  >
+            <h2 style= " display:flex; justify-self: center">Upload Cpp Job </h2>
+            <form   method="post" action="/handleUploadFile?typejob=cppjob" enctype="multipart/form-data" style="display: flex; flex-direction: column;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 10px; ">
+                    <label >Job Name</label>
+                    <input type="text" name="job-name" placeholder="Enter job name" required>
+                </div>
+                <div  style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                    <label >Number of Chunks</label>
+                    <input type="number"  name="num-chunks" min="1" value="1" required>
+                </div>
+                <div  style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                    <label >Number of CPU / Chunk  </label>
+                    <input type="number"  name="num-CpuPerChunk" min="1" value="1" required>
+                </div>
+                <div  style="display: flex; justify-content: space-between; margin-bottom: 10px;" >
+                    <label>Physical Memory</label>
+                    <input type="text" name="memory" value="400mb" required>
+                </div>
+                <div  style="display: flex; justify-content: space-between; margin-bottom: 10px;" >
+                    <label>Wall time</label>
+                    <input type="text"  name="wall_time" value="01:00:00" required>
+                </div>
+                <div  style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                    <label >Gmail Notification</label>
+                    <input type="checkbox" name="is_gmail_notification" value="false" onchange="updateCheckboxValue(this)">
+                </div>
+                <div>
+
+                </div>
+                <!--            <form  method="post" action="/uploadCppMpiFiles" enctype="multipart/form-data">-->
+                <div  style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                    <label for="maincppfile">Main File:</label>
+                    <input type="file" name="mainfile" id="maincppfile" />
+                </div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                    <label for="enclosedcppfiles">Enclosed Files:</label>
+                    <input type="file" name="enclosedfiles" id="enclosedcppfiles" multiple />
+                </div>
+                <!--            </form>-->
+
+                <input type="submit" value="Submit Job"  style=" width:50%; display: flex; align-self: center;"/>
+
+            </form>
+    </div>
+
+
+</div>
+    <div class="contain-list-of-directory">
+        <h2> This is your directory:</h2>
+        <div style="height: 10px"></div>
+        <div class="scrollable-list" th:if="${filenames}">
+            <ul>
+                <li th:each="filename : ${filenames}">
+                    <a th:href="@{/downloadfile(filename=${filename})}" th:text="${filename}"></a>
+                </li>
+            </ul>
+        </div>
+    </div>
+    </div>
+</div>
+</body>
+
+<script>
+    function updateCheckboxValue(checkbox) {
+        // If checkbox is checked, set the value to true, otherwise false
+        if (checkbox.checked) {
+            checkbox.value = 'true'; // Set value to true when checked
+        } else {
+            checkbox.value = 'false'; // Set value to false when unchecked
+        }
+    }
+
+</script>
+</html>

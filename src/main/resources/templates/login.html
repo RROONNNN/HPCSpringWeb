@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Vbox HPC</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: url('/uploads/image/background_login.jpg') no-repeat center center fixed;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            color: white;
+        }
+
+        .login-container {
+            background-color: rgba(0, 0, 0, 0.5);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width:400px;
+            text-align: center;
+
+
+        }
+        .login-container div{
+            display: flex;
+
+            align-items: center;
+        }
+        .login-container h2 {
+            margin-bottom: 20px;
+        }
+        .login-container .gmail-login,
+        .login-container .gmail-signup {
+            width: 100%;
+            padding: 10px;
+            background-color: transparent;
+            border: none;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .login-container .gmail-login img,
+        .login-container .gmail-signup img {
+            width: 50%;
+            height: auto;
+        }
+    </style>
+</head>
+<body>
+<div class="login-container">
+    <img src="/uploads/image/vbox_logo.png" alt="Vbox HPC" style="width: 100px; height: auto;">
+    <h2>Vbox HPC Server</h2>
+    <div>
+
+        <button class="gmail-signup" onclick="window.location.href='/oauth2/authorization/google'">
+            <img src="/uploads/image/web_light_rd_SU@1x.png" alt="Sign up with Gmail">
+        </button>
+    </div>
+</div>
+</body>
+</html>
