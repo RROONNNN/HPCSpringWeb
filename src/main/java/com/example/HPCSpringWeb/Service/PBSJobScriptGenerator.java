@@ -15,8 +15,8 @@ public class PBSJobScriptGenerator {
                 "#PBS -l nodes="+jobProperties.getNumOfChunks()+":ppn=" + jobProperties.getNcpus() + "\n" +
                 "#PBS -l walltime=" + jobProperties.getWalltime() + "\n" +
                 "#PBS -l mem=" + jobProperties.getMem() + "\n" +
-                "#PBS -o /media/sf_Share/" + jobProperties.getOwner().getUser_name_ssh() + "/\n" +
-                "#PBS -e /media/sf_Share/" + jobProperties.getOwner().getUser_name_ssh() + "/\n" +
+                "#PBS -o vbox.local:/media/sf_Share/" + jobProperties.getOwner().getUser_name_ssh() + "/\n" +
+                "#PBS -e vbox.local:/media/sf_Share/" + jobProperties.getOwner().getUser_name_ssh() + "/\n" +
                 "\n" ;
         if(jobProperties.isMailNotification()){
             scriptContent += "#PBS -m abe\n" +

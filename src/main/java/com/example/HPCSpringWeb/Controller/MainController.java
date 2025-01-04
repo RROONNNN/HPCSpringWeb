@@ -117,12 +117,13 @@ theModel.addAttribute("user",user);
                 Files.write(path, mainFile.getBytes());
                 System.out.println("File uploaded successfully: " + mainFile.getOriginalFilename());
 if (typejob==null||typejob.equals(JobTypes.cppmpijob.toString())){
-                sshService.SubmitCppMpiJob(jobProperties,mainFile);}
+                sshService.SubmitCppMpiJob(jobProperties,mainFile,enclosedfiles);}
                 else if(typejob.equals(JobTypes.pythonjob.toString())){
-                    sshService.SubmitPythonJob(jobProperties,mainFile);
+                    sshService.SubmitPythonJob(jobProperties,mainFile,enclosedfiles);
                 }
                 else if(typejob.equals(JobTypes.cppjob.toString())){
-                    sshService.SubmitCppJob(jobProperties,mainFile);
+                    System.out.println("SubmitCppJob");
+                    sshService.SubmitCppJob(jobProperties,mainFile,enclosedfiles);
                 }
                 System.out.println("Submit successfully: " + mainFile.getOriginalFilename());
 //                         List<String> filenames = FileService.getAllFilenames(upload_dir);

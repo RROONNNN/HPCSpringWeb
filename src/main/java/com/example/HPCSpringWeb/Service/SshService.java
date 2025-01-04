@@ -17,6 +17,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.List;
 
 @Service
 @Scope(value="session",proxyMode = ScopedProxyMode.TARGET_CLASS)
@@ -114,13 +115,19 @@ public class SshService {
         return fileName.substring(0, lastDotIndex);
     }
 
-public void SubmitCppMpiJob(JobProperties jobProperties, MultipartFile file){
+public void SubmitCppMpiJob(JobProperties jobProperties, MultipartFile file, List<MultipartFile> enclosedfiles){
      System.out.println("HOST: "+host);
     MoveFileToUserFile(file.getOriginalFilename());//b1
+    for(MultipartFile enclosedfile: enclosedfiles) {
+        if (enclosedfile.isEmpty()) {
+            continue; //next pls
+        }
+        MoveFileToUserFile(enclosedfile.getOriginalFilename());
+    }
     //get name file without extension
 //String namePbsJob=getFileNameWithoutExtension(file.getOriginalFilename())+".pbs";
     try {
-        String commandToExecute = "module load mpi \n mpic++ " + "calcPiMpi.cpp" + "\n" + "mpirun -np " + jobProperties.getNumOfChunks() * jobProperties.getNcpus() + " ./a.out";
+        String commandToExecute = "module load mpi \n mpic++ " + file.getOriginalFilename() + "\n" + "mpirun -np " + jobProperties.getNumOfChunks() * jobProperties.getNcpus() + " ./a.out";
      executeSshCommand_User(PBSJobScriptGenerator.Command_createPBSJobScript(jobProperties, commandToExecute));
     } catch (IOException e) {
         throw new RuntimeException(e);
@@ -134,10 +141,16 @@ System.out.println("jobId: "+jobId);
         }
 }
 
-public void SubmitPythonJob(JobProperties jobProperties, MultipartFile file){
+public void SubmitPythonJob(JobProperties jobProperties, MultipartFile file,List<MultipartFile> enclosedfiles){
     MoveFileToUserFile(file.getOriginalFilename());//b1
+    for(MultipartFile enclosedfile: enclosedfiles) {
+        if (enclosedfile.isEmpty()) {
+            continue; //next pls
+        }
+        MoveFileToUserFile(enclosedfile.getOriginalFilename());
+    }
     try {
-        String commandToExecute = "python3 " + file.getOriginalFilename();
+        String commandToExecute = "python3.6 " + file.getOriginalFilename();
         executeSshCommand_User(PBSJobScriptGenerator.Command_createPBSJobScript(jobProperties, commandToExecute));
     } catch (IOException e) {
         throw new RuntimeException(e);
@@ -150,15 +163,21 @@ public void SubmitPythonJob(JobProperties jobProperties, MultipartFile file){
         throw new RuntimeException(e);
     }
 }
-    public void SubmitCppJob(JobProperties jobProperties, MultipartFile file){
+    public void SubmitCppJob(JobProperties jobProperties, MultipartFile file,List<MultipartFile> enclosedfiles){
         MoveFileToUserFile(file.getOriginalFilename());//b1
+        for(MultipartFile enclosedfile: enclosedfiles) {
+            if (enclosedfile.isEmpty()) {
+                continue; //next pls
+            }
+            MoveFileToUserFile(enclosedfile.getOriginalFilename());
+        }
         try {
-            String commandToExecute = "g++ " + file.getOriginalFilename();
+            String commandToExecute = "g++ " + file.getOriginalFilename() +"\n ./a.out";
             executeSshCommand_User(PBSJobScriptGenerator.Command_createPBSJobScript(jobProperties, commandToExecute));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        String command="cd ~/jobs;qsub "+  jobProperties.getName() + ".pbs";
+        String command="cd ~/jobs;qsub "+  jobProperties.getName() + ".pbs ";
         try {
             String jobId= executeSshCommand_User(command);//b2 submit
             System.out.println("jobId: "+jobId);
@@ -166,14 +185,21 @@ public void SubmitPythonJob(JobProperties jobProperties, MultipartFile file){
             throw new RuntimeException(e);
         }
     }
-
-
-
     private void MoveFileToUserFile(String fileName){
        String   remote_dir=REMOTE_DIR+user.getUser_name_ssh()+"/";
 
-        String command = "mv " + REMOTE_DIR + fileName + " /export/home/"+this.user.getUser_name_ssh()+"/jobs/ ; chown "+this.user.getUser_name_ssh()+" /export/home/"+this.user.getUser_name_ssh()+"/jobs/"+fileName;
-        System.out.println(command);
+        String command = "cp " + remote_dir + fileName + " /export/home/"+this.user.getUser_name_ssh()+"/jobs/ ; chown "+this.user.getUser_name_ssh()+" /export/home/"+this.user.getUser_name_ssh()+"/jobs/"+fileName;
+        System.out.println("MoveFileToUserFile COmmand :"+command);
+        try {
+            this.executeSshCommand_Admin(command);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    private void MoveFileToRemoteDir(String fileName){
+        String   remote_dir=REMOTE_DIR+user.getUser_name_ssh()+"/";
+        String command ="mv "+ " /export/home/"+this.user.getUser_name_ssh()+"/jobs/"+fileName+" "+remote_dir;
+        System.out.println("MoveFileToRemoteDir COmmand :"+command);
         try {
             this.executeSshCommand_Admin(command);
         } catch (Exception e) {
@@ -211,12 +237,11 @@ public String getMemAvailable(){
     public void addUser() throws IOException {
         String command = "sudo useradd -m -s /bin/bash " + user.getUser_name_ssh() +
                 " && echo '" + user.getUser_name_ssh() + ":" + user.getPassword_ssh() + "' | sudo chpasswd ;sudo usermod -aG vboxsf "+ user.getUser_name_ssh();
+        command+="; rocks sync users";
+        System.out.println("commandaddUser: "+command);
             String output=executeSshCommand_Admin(command);
             command="mkdir ~/jobs";
             output=executeSshCommand_User(command);
             System.out.println("output: "+output);
-
 }
-
-
 }
